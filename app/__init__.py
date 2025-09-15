@@ -2,18 +2,17 @@ import os
 
 from flask import Flask
 from marshmallow import ValidationError
-from werkzeug.exceptions import HTTPException
-
+from werkzeug.exceptions import HTTPException, NotFound
 
 
 def create_app(env: str = None) -> Flask:
     app = Flask(__name__)
     from . import config
 
-    match env or os.getenv('ENV', default='PRODUCTION'):
-        case 'PRODUCTION':
+    match env or os.getenv("ENV", default="PRODUCTION"):
+        case "PRODUCTION":
             app.config.from_object(config.ProductionSettings)
-        case 'DEVELOPMENT':
+        case "DEVELOPMENT":
             app.config.from_object(config.DevelopmentSettings)
         case _:
             raise RuntimeError(f"Ambiente de execução '{env}' não reconhecido")
@@ -24,20 +23,32 @@ def create_app(env: str = None) -> Flask:
     ma.init_app(app)
     api.init_app(app)
 
+    @app.before_request
+    def before_request():
+        # TODO: Deve checar se o token é válido antes de permitir acessar qualquer endpoint
+        pass
+
     @app.errorhandler(ValidationError)
     def handle_validation_error(error: ValidationError):
-        return {'errors': {error.field_name: error.messages}}, 422
+        return {"description": "Erro de validação", "errors": error.messages}, 422
+
+    @app.errorhandler(NotFound)
+    def handle_not_found(error):
+        return {"description": "Recurso não encontrado"}, error.code
 
     @app.errorhandler(HTTPException)
     def handle_http_exception(error):
-        return {'description': error.description}, error.code
+        return {"description": "Erro HTTP inesperado"}, error.code
 
     @app.errorhandler(Exception)
     def handle_generic_exception(error):
         print(error)
-        return {'description': 'Erro interno no servidor'}, 500
+        return {"description": "Erro interno no servidor"}, 500
 
     from app import models
-    from app import routes
+    from app import schemas
+
+    from app.routes import menu_blp
+    api.register_blueprint(menu_blp)
 
     return app
