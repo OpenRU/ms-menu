@@ -12,6 +12,8 @@ if not ENV_PATH.exists():
 
 load_dotenv(ENV_PATH)
 
+MS_AUTH_PREFIX = os.getenv("MS_AUTH_PREFIX")
+
 
 class BaseSettings:
     SECRET_KEY = os.getenv("SECRET_KEY")

@@ -23,11 +23,6 @@ def create_app(env: str = None) -> Flask:
     ma.init_app(app)
     api.init_app(app)
 
-    @app.before_request
-    def before_request():
-        # TODO: Deve checar se o token é válido antes de permitir acessar qualquer endpoint
-        pass
-
     @app.errorhandler(ValidationError)
     def handle_validation_error(error: ValidationError):
         return {"description": "Erro de validação", "errors": error.messages}, 422
