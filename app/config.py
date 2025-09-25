@@ -21,6 +21,9 @@ class BaseSettings:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI")
 
+    CORS_ORIGINS = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "").split(",") if origin]
+    CORS_RESOURCES = os.getenv(r"CORS_RESOURCES", r"/*")
+
     API_TITLE = "MS-MENU"
     API_VERSION = "v1"
     OPENAPI_VERSION = os.getenv("OPENAPI_VERSION", "3.0.2")

@@ -23,6 +23,9 @@ def create_app(env: str = None) -> Flask:
     ma.init_app(app)
     api.init_app(app)
 
+    from flask_cors import CORS
+    CORS(app)
+
     @app.errorhandler(ValidationError)
     def handle_validation_error(error: ValidationError):
         return {"description": "Erro de validação", "errors": error.messages}, 422
