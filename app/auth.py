@@ -1,18 +1,36 @@
+import logging
+
 import requests
 from flask import request
 
-from app.config import MS_AUTH_PREFIX
+from app.config import AUTH_URI
+
+log = logging.getLogger(__name__)
 
 
 def is_authenticated():
+    if AUTH_URI is None:
+        log.error("ERROR: A variável de ambiente AUTH_URI não foi definida")
+        return False
+
     token = request.headers.get("Authorization")
 
     if token is None:
+        log.warning("WARNING: Token não encontrado no Header Authorization")
         return False
 
     try:
-        endpoint = f"{MS_AUTH_PREFIX}/validate-token"
-        response = requests.post(endpoint, {'token': token})
-        return response.status_code == 200
-    except requests.RequestException:
+        endpoint = f"{AUTH_URI}/auth/validate-token/"
+        response = requests.get(endpoint, data={'token': token})
+
+        if response.status_code == 200:
+            return True
+        if response.status_code == 401:
+            return False
+
+        log.warning(f"WARNING: Código HTTP não documentado em response da API de autenticação: {response.status_code}")
+        return False
+
+    except requests.RequestException as exc:
+        log.exception(f"EXCEPTION: Erro durante a validação do token: {exc}")
         return False

@@ -5,14 +5,14 @@ from typing import Any
 from flask.cli import load_dotenv
 
 BASE_DIR = Path(__file__).parent.parent.resolve()
-ENV_PATH = BASE_DIR / ".env"
 
+ENV_PATH = BASE_DIR / ".env"
 if not ENV_PATH.exists():
     raise RuntimeError(f"Arquivo .env não encontrado em {ENV_PATH}")
 
 load_dotenv(ENV_PATH)
 
-MS_AUTH_PREFIX = os.getenv("MS_AUTH_PREFIX")
+AUTH_URI = os.getenv("AUTH_URI")
 
 
 class BaseSettings:
@@ -45,14 +45,14 @@ class DevelopmentSettings(BaseSettings):
     OPENAPI_SWAGGER_UI_URL = os.getenv("OPENAPI_SWAGGER_UI_URL", "https://cdn.jsdelivr.net/npm/swagger-ui-dist/")
 
     API_SPEC_OPTIONS: dict[str, Any] = {
-        "security": [{"bearerAuth": []}],
+        "security": [{"TokenAuth": []}],
         "components": {
             "securitySchemes": {
-                "bearerAuth": {
-                    "type": "http",
-                    "scheme": "bearer",
-                    "bearerFormat": "JWT"
+                "TokenAuth": {
+                    "type": "apiKey",
+                    "in": "header",
+                    "name": "Authorization",
                 }
             }
-        }
+        },
     }
