@@ -12,7 +12,7 @@ if not ENV_PATH.exists():
 
 load_dotenv(ENV_PATH)
 
-AUTH_URI = os.getenv("AUTH_URI")
+AUTH_URI = os.getenv("AUTH_URI", None)
 
 
 class BaseSettings:

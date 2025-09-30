@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 
 
 def is_authenticated():
-    if AUTH_URI is None:
+    if AUTH_URI is None or not AUTH_URI.strip():
         log.error("ERROR: A variável de ambiente AUTH_URI não foi definida")
         return True
 
@@ -22,6 +22,7 @@ def is_authenticated():
     try:
         endpoint = f"{AUTH_URI}/auth/validate-token/"
         response = requests.get(endpoint, headers={"Authorization": token})
+        print(response.request.headers)
 
         if response.status_code == 200:
             return True
