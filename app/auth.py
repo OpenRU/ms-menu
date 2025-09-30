@@ -22,7 +22,6 @@ def is_authenticated():
     try:
         endpoint = f"{AUTH_URI}/auth/validate-token/"
         response = requests.get(endpoint, headers={"Authorization": token})
-        print(response.request.headers)
 
         if response.status_code == 200:
             return True
